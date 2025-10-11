@@ -50,5 +50,12 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       open: true,
     },
+    define: {
+      "process.env": {}, // hindari error env undefined
+      DELCOM_BASEURL: JSON.stringify(
+        loadEnv(mode, process.cwd(), "").VITE_DELCOM_BASEURL ||
+          "https://open-api.delcom.org/api/v1"
+      ),
+    },
   };
 });

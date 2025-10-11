@@ -1,21 +1,22 @@
 import { apiHelper } from "@/helpers/apiHelper";
 
-// Ambil base URL dari .env
+// Ambil dari environment (.env)
 const BASE_URL = import.meta.env.VITE_DELCOM_BASEURL;
 
-// Log ini dijalankan begitu file dimuat
-console.log("🚀 [AuthApi] Loaded with BASE_URL =", BASE_URL);
-
 const AuthApi = {
+  // 🟢 REGISTER
   async register(formData) {
+    // Tambahkan log untuk debug environment dan endpoint
     console.log("🌍 BASE URL:", BASE_URL);
     console.log("📦 Register URL:", `${BASE_URL}/auth/register`);
+    console.log("📤 Data dikirim:", formData);
 
     try {
       const response = await apiHelper.post(
         `${BASE_URL}/auth/register`,
         formData
       );
+      console.log("✅ Response register:", response);
       return response;
     } catch (error) {
       console.error("❌ Error register:", error);
@@ -23,6 +24,7 @@ const AuthApi = {
     }
   },
 
+  // 🟢 LOGIN
   async login(formData) {
     console.log("📦 Login URL:", `${BASE_URL}/auth/login`);
     try {
@@ -34,6 +36,7 @@ const AuthApi = {
     }
   },
 
+  // 🟢 GET PROFILE
   async getProfile(token) {
     console.log("📦 Profile URL:", `${BASE_URL}/auth/profile`);
     try {

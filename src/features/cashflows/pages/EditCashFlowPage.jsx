@@ -1,8 +1,7 @@
-// src/features/cashflows/pages/EditCashFlowPage.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateCashFlow } from "@/features/cashflows/states/cashflowSlice"; // ✅ pakai alias @
-import CashFlowApi from "@/features/cashflows/api/CashFlowApi"; // ✅ pakai alias @
+import { updateCashFlow } from "@/features/cashflows/states/cashflowSlice";
+import CashFlowApi from "@/features/cashflows/api/CashFlowApi";
 import Swal from "sweetalert2";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -22,7 +21,6 @@ const EditCashFlowPage = () => {
 
   const [loading, setLoading] = useState(true);
 
-  // 🟢 Ambil data cashflow berdasarkan ID
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,17 +35,15 @@ const EditCashFlowPage = () => {
         });
         setLoading(false);
       } catch (err) {
-        Swal.fire(
-          "Gagal!",
-          "Data tidak ditemukan atau error koneksi.",
-          "error"
-        );
-        navigate("/cashflows");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal!",
+          text: err?.message || "Terjadi kesalahan saat mengambil data.",
+        });
       }
     };
-
     fetchData();
-  }, [id, token, navigate]);
+  }, [id, token]);
 
   const handleChange = (e) => {
     setFormData({
@@ -71,79 +67,123 @@ const EditCashFlowPage = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-5">Memuat data...</p>;
+  if (loading)
+    return (
+      <div className="text-center mt-5 text-secondary">
+        <div className="spinner-border text-success mb-2" role="status"></div>
+        <p>Memuat data cash flow...</p>
+      </div>
+    );
 
   return (
-    <div className="container mt-4" style={{ maxWidth: 600 }}>
-      <h3 className="mb-4">Edit Cash Flow</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Tipe Transaksi</label>
-          <select
-            name="type"
-            className="form-select"
-            value={formData.type}
-            onChange={handleChange}
-          >
-            <option value="inflow">Pemasukan</option>
-            <option value="outflow">Pengeluaran</option>
-          </select>
-        </div>
+    <div
+      className="container-fluid py-5"
+      style={{
+        background: "linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%)",
+        minHeight: "100vh",
+      }}
+    >
+      <div className="container" style={{ maxWidth: 600 }}>
+        <div
+          className="card shadow-lg border-0 p-4"
+          style={{
+            borderRadius: "16px",
+            backgroundColor: "white",
+          }}
+        >
+          <h4 className="fw-bold text-center text-warning mb-4">
+            ✏️ Edit Data Cash Flow
+          </h4>
 
-        <div className="mb-3">
-          <label className="form-label">Sumber Dana</label>
-          <select
-            name="source"
-            className="form-select"
-            value={formData.source}
-            onChange={handleChange}
-          >
-            <option value="cash">Cash</option>
-            <option value="savings">Tabungan</option>
-            <option value="loans">Pinjaman</option>
-          </select>
-        </div>
+          <form onSubmit={handleSubmit}>
+            {/* Tipe Transaksi */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold text-muted">
+                Tipe Transaksi
+              </label>
+              <select
+                name="type"
+                className="form-select shadow-sm"
+                value={formData.type}
+                onChange={handleChange}
+              >
+                <option value="inflow">Pemasukan</option>
+                <option value="outflow">Pengeluaran</option>
+              </select>
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label">Label</label>
-          <input
-            type="text"
-            name="label"
-            className="form-control"
-            value={formData.label}
-            onChange={handleChange}
-            required
-          />
-        </div>
+            {/* Sumber Dana */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold text-muted">
+                Sumber Dana
+              </label>
+              <select
+                name="source"
+                className="form-select shadow-sm"
+                value={formData.source}
+                onChange={handleChange}
+              >
+                <option value="cash">Cash</option>
+                <option value="savings">Tabungan</option>
+                <option value="loans">Pinjaman</option>
+              </select>
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label">Deskripsi</label>
-          <textarea
-            name="description"
-            className="form-control"
-            rows="2"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
+            {/* Label */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold text-muted">Label</label>
+              <input
+                type="text"
+                name="label"
+                className="form-control shadow-sm"
+                placeholder="Contoh: Gaji Bulanan / Belanja Harian"
+                value={formData.label}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label">Nominal</label>
-          <input
-            type="number"
-            name="nominal"
-            className="form-control"
-            value={formData.nominal}
-            onChange={handleChange}
-            required
-          />
-        </div>
+            {/* Deskripsi */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold text-muted">
+                Deskripsi
+              </label>
+              <textarea
+                name="description"
+                className="form-control shadow-sm"
+                rows="2"
+                placeholder="Contoh: Gaji bulan Oktober / Beli bahan dapur"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              ></textarea>
+            </div>
 
-        <button type="submit" className="btn btn-warning w-100">
-          Simpan Perubahan
-        </button>
-      </form>
+            {/* Nominal */}
+            <div className="mb-4">
+              <label className="form-label fw-semibold text-muted">
+                Nominal (Rp)
+              </label>
+              <input
+                type="number"
+                name="nominal"
+                className="form-control shadow-sm"
+                placeholder="Masukkan nominal transaksi"
+                value={formData.nominal}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-warning w-100 py-2 fw-semibold shadow-sm"
+            >
+              💾 Simpan Perubahan
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

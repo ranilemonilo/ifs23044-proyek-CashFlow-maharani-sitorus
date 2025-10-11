@@ -1,7 +1,9 @@
-// src/features/cashflows/pages/AddCashFlowPage.jsx
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addCashFlow } from "@/features/cashflows/states/cashflowSlice"; // ✅ pakai alias @
+import {
+  addCashFlow,
+  fetchCashFlows,
+} from "@/features/cashflows/states/cashflowSlice";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
@@ -27,99 +29,167 @@ const AddCashFlowPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        data.append(key, value);
-      });
+      const today = new Date().toISOString().split("T")[0];
+      const payload = {
+        ...formData,
+        nominal: Number(formData.nominal),
+        date: today,
+      };
 
-      await dispatch(addCashFlow({ token, formData: data })).unwrap();
-      Swal.fire("Berhasil!", "Data cash flow berhasil ditambahkan.", "success");
+      await dispatch(addCashFlow({ token, formData: payload })).unwrap();
+      Swal.fire(
+        "✅ Berhasil!",
+        "Data cash flow berhasil ditambahkan.",
+        "success"
+      );
+      await dispatch(fetchCashFlows({ token }));
       navigate("/cashflows");
     } catch (err) {
-      Swal.fire(
-        "Gagal!",
-        err || "Terjadi kesalahan saat menambah data.",
-        "error"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text: err?.message || "Terjadi kesalahan saat menambah data.",
+      });
     }
   };
 
   return (
-    <div className="container mt-4" style={{ maxWidth: 600 }}>
-      <h3 className="mb-4">Tambah Cash Flow</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Tipe Transaksi</label>
-          <select
-            name="type"
-            className="form-select"
-            value={formData.type}
-            onChange={handleChange}
+    <div
+      className="d-flex align-items-center justify-content-center py-5"
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #f8fafc 0%, #eef2f3 100%)",
+      }}
+    >
+      <div
+        className="card shadow-lg border-0 rounded-4 p-4"
+        style={{ width: "100%", maxWidth: "550px" }}
+      >
+        <div className="text-center mb-4">
+          <div
+            className="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+            style={{
+              width: 70,
+              height: 70,
+              background: "linear-gradient(135deg, #28a745, #4cd964)",
+              color: "white",
+              fontSize: 30,
+              fontWeight: "bold",
+            }}
           >
-            <option value="inflow">Pemasukan</option>
-            <option value="outflow">Pengeluaran</option>
-          </select>
+            +
+          </div>
+          <h3 className="fw-bold text-secondary">Tambah Transaksi Baru</h3>
+          <p className="text-muted small">
+            Catat transaksi keuangan Anda dengan mudah dan cepat 💸
+          </p>
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Sumber Dana</label>
-          <select
-            name="source"
-            className="form-select"
-            value={formData.source}
-            onChange={handleChange}
+        <form onSubmit={handleSubmit}>
+          {/* === Tipe Transaksi === */}
+          <div className="mb-3">
+            <label className="form-label fw-semibold text-muted">
+              Jenis Transaksi
+            </label>
+            <select
+              name="type"
+              className="form-select rounded-3 shadow-sm"
+              value={formData.type}
+              onChange={handleChange}
+              style={{ borderColor: "#dee2e6" }}
+            >
+              <option value="inflow">💰 Pemasukan</option>
+              <option value="outflow">💸 Pengeluaran</option>
+            </select>
+          </div>
+
+          {/* === Sumber Dana === */}
+          <div className="mb-3">
+            <label className="form-label fw-semibold text-muted">
+              Sumber Dana
+            </label>
+            <select
+              name="source"
+              className="form-select rounded-3 shadow-sm"
+              value={formData.source}
+              onChange={handleChange}
+            >
+              <option value="cash">💵 Cash</option>
+              <option value="savings">🏦 Tabungan</option>
+              <option value="loans">💳 Pinjaman</option>
+            </select>
+          </div>
+
+          {/* === Label === */}
+          <div className="mb-3">
+            <label className="form-label fw-semibold text-muted">Label</label>
+            <input
+              type="text"
+              name="label"
+              className="form-control rounded-3 shadow-sm"
+              placeholder="Contoh: Gaji / Belanja mingguan"
+              value={formData.label}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* === Deskripsi === */}
+          <div className="mb-3">
+            <label className="form-label fw-semibold text-muted">
+              Deskripsi
+            </label>
+            <textarea
+              name="description"
+              className="form-control rounded-3 shadow-sm"
+              placeholder="Contoh: Gaji bulan Oktober / Beli kebutuhan mandi"
+              rows="2"
+              value={formData.description}
+              onChange={handleChange}
+              required
+            ></textarea>
+          </div>
+
+          {/* === Nominal === */}
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-muted">Nominal</label>
+            <div className="input-group shadow-sm rounded-3">
+              <span className="input-group-text bg-light text-secondary">
+                Rp
+              </span>
+              <input
+                type="number"
+                name="nominal"
+                className="form-control"
+                placeholder="Masukkan jumlah (contoh: 100000)"
+                value={formData.nominal}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="btn w-100 text-white fw-semibold shadow-sm"
+            style={{
+              background: "linear-gradient(135deg, #28a745, #4cd964)",
+              border: "none",
+            }}
           >
-            <option value="cash">Cash</option>
-            <option value="savings">Tabungan</option>
-            <option value="loans">Pinjaman</option>
-          </select>
-        </div>
+            💾 Simpan Transaksi
+          </button>
 
-        <div className="mb-3">
-          <label className="form-label">Label</label>
-          <input
-            type="text"
-            name="label"
-            className="form-control"
-            placeholder="Contoh: gaji / alat-mandi"
-            value={formData.label}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Deskripsi</label>
-          <textarea
-            name="description"
-            className="form-control"
-            placeholder="Contoh: Gaji bulan Oktober / Beli sabun dan shampoo"
-            rows="2"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Nominal</label>
-          <input
-            type="number"
-            name="nominal"
-            className="form-control"
-            placeholder="Masukkan nominal (Rp)"
-            value={formData.nominal}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button type="submit" className="btn btn-success w-100">
-          Simpan
-        </button>
-      </form>
+          <button
+            type="button"
+            className="btn btn-outline-secondary w-100 mt-2"
+            onClick={() => navigate("/cashflows")}
+          >
+            ← Kembali
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,8 @@
 // src/App.jsx
+
 import React from "react";
+console.log("✅ App.jsx loaded!");
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,14 +14,17 @@ import {
 import AuthLayout from "@/features/auth/layouts/AuthLayout";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
+import SettingsPage from "@/features/cashflows/pages/SettingsPage";
 
 // === CASHFLOW ===
 import CashFlowLayout from "@/features/cashflows/layouts/CashFlowLayout";
 import CashFlowListPage from "@/features/cashflows/pages/CashFlowListPage";
 import AddCashFlowPage from "@/features/cashflows/pages/AddCashFlowPage";
 import EditCashFlowPage from "@/features/cashflows/pages/EditCashFlowPage";
+import DetailCashFlowPage from "@/features/cashflows/pages/DetailCashFlowPage";
 import StatsPage from "@/features/cashflows/pages/StatsPage";
-
+import LabelStatsPage from "@/features/cashflows/pages/LabelStatsPage";
+import AboutPage from "@/features/cashflows/pages/AboutPage"; //
 // === ROUTE PROTECTOR ===
 import PrivateRoute from "@/routes/PrivateRoute";
 
@@ -42,11 +48,16 @@ const App = () => {
             <Route path="add" element={<AddCashFlowPage />} />
             <Route path="edit/:id" element={<EditCashFlowPage />} />
             <Route path="stats" element={<StatsPage />} />
+            <Route path="detail/:id" element={<DetailCashFlowPage />} />
+            <Route path="labels" element={<LabelStatsPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Route>
       </Routes>
     </Router>
   );
 };
+console.log("✅ App Loaded");
 
 export default App;

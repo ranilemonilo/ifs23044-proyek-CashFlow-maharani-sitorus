@@ -9,7 +9,7 @@ import cashflowReducer from "@/features/cashflows/states/cashflowSlice";
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    // cashflows: cashflowReducer,
+    cashflows: cashflowReducer,
     // users: userReducer,
   },
 });

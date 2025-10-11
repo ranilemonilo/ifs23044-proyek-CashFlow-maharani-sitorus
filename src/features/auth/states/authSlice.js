@@ -2,15 +2,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AuthApi from "@/features/auth/api/AuthApi";
 
-// 🧠 Async Thunks (fungsi async buat login & register)
+/* ================================
+   🔐 Async Thunks (Register & Login)
+================================ */
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (formData, { rejectWithValue }) => {
     try {
       const res = await AuthApi.register(formData);
-      return res.data;
+      return res.data; // pastikan API mengembalikan data user & token
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
@@ -20,23 +22,27 @@ export const loginUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const res = await AuthApi.login(formData);
-      return res.data;
+      return res.data; // data: { user, token }
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-// 🧩 State awal
+/* ================================
+   ⚙️ State Awal
+================================ */
 const initialState = {
-  user: null,
+  user: JSON.parse(localStorage.getItem("user")) || null, // ambil dari localStorage kalau ada
   token: localStorage.getItem("token") || null,
   loading: false,
   error: null,
   isAuthenticated: !!localStorage.getItem("token"),
 };
 
-// 🧱 Slice
+/* ================================
+   🧩 Slice
+================================ */
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -46,24 +52,30 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
     },
   },
   extraReducers: (builder) => {
     builder
-      // REGISTER
+      // === REGISTER ===
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // LOGIN
+      // === LOGIN ===
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -74,6 +86,7 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isAuthenticated = true;
         localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -82,6 +95,8 @@ const authSlice = createSlice({
   },
 });
 
-// 🏁 Export
+/* ================================
+   🚀 Export
+================================ */
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;

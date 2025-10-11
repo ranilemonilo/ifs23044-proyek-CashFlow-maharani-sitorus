@@ -9,9 +9,8 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading, error, isAuthenticated } = useSelector(
-    (state) => state.auth
-  );
+  const { loading, error } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,13 +23,13 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(loginUser(formData)).unwrap();
+      await dispatch(loginUser(formData)).unwrap();
       Swal.fire("Berhasil!", "Login berhasil!", "success");
-      navigate("/cashflows"); // nanti diarahkan ke halaman cashflow
+      navigate("/cashflows"); // arahkan ke halaman utama cashflow
     } catch (err) {
       Swal.fire(
         "Gagal!",
-        err || "Login gagal, periksa email/password",
+        err || "Login gagal, periksa email dan password.",
         "error"
       );
     }
@@ -39,7 +38,9 @@ const LoginPage = () => {
   return (
     <div className="container mt-5" style={{ maxWidth: 400 }}>
       <h3 className="text-center mb-4">Login</h3>
+
       <form onSubmit={handleSubmit}>
+        {/* Email */}
         <div className="mb-3">
           <label className="form-label">Email</label>
           <input
@@ -52,6 +53,7 @@ const LoginPage = () => {
           />
         </div>
 
+        {/* Password */}
         <div className="mb-3">
           <label className="form-label">Password</label>
           <input
@@ -64,6 +66,7 @@ const LoginPage = () => {
           />
         </div>
 
+        {/* Tombol login */}
         <button
           type="submit"
           className="btn btn-primary w-100"
@@ -72,9 +75,23 @@ const LoginPage = () => {
           {loading ? "Sedang login..." : "Masuk"}
         </button>
 
+        {/* Error message */}
         {error && (
           <div className="alert alert-danger mt-3 text-center">{error}</div>
         )}
+
+        {/* Link ke register */}
+        <div className="text-center mt-3">
+          <p className="mb-0">
+            Belum punya akun?{" "}
+            <a
+              href="/auth/register"
+              className="text-primary fw-bold text-decoration-none"
+            >
+              Daftar di sini
+            </a>
+          </p>
+        </div>
       </form>
     </div>
   );

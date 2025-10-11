@@ -22,8 +22,6 @@
     "recharts": "^3.2.1",
     "redux-persist": "^6.0.0",
     "sweetalert2": "^11.23.0",
-
-    // ✅ Tambahkan rollup ke dependencies agar Vercel bisa akses modul native-nya
     "rollup": "^4.52.4"
   },
   "devDependencies": {

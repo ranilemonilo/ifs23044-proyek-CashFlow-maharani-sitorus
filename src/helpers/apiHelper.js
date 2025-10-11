@@ -24,19 +24,8 @@ export const apiHelper = {
   async post(endpoint, data = {}, token = null, isFormData = false) {
     const headers = buildHeaders(token, isFormData);
 
-    // 🔍 Logging data dengan aman
     console.log("🚀 POST ke:", `${BASE_URL}${endpoint}`);
-    console.log("🔑 Token dikirim:", token);
-
-    // ⛑️ Cek apakah data FormData atau object biasa
-    if (data instanceof FormData) {
-      console.log("📦 Data FormData dikirim:");
-      for (let pair of data.entries()) {
-        console.log(`➡️ ${pair[0]}: ${pair[1]}`);
-      }
-    } else {
-      console.log("📦 Data JSON dikirim:", data);
-    }
+    console.log("📦 Data:", data);
 
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: "POST",
@@ -73,7 +62,6 @@ export const apiHelper = {
 
 /**
  * 🧱 Helper untuk bikin headers request
- * - Kalau pakai FormData → jangan tambahkan Content-Type
  */
 function buildHeaders(token = null, isFormData = false) {
   const headers = {};
@@ -88,19 +76,19 @@ function buildHeaders(token = null, isFormData = false) {
  * ⚙️ Fungsi umum untuk handle response dan error
  */
 async function handleResponse(response) {
-  let result;
-
   try {
-    result = await response.json();
-  } catch {
-    throw new Error("Gagal membaca respon dari server (bukan JSON)");
-  }
+    const json = await response.json();
 
-  if (!response.ok) {
-    throw new Error(
-      result.message || "Terjadi kesalahan saat memproses permintaan"
-    );
-  }
+    if (!response.ok) {
+      throw new Error(
+        json.message || "Terjadi kesalahan saat memproses permintaan"
+      );
+    }
 
-  return result;
+    // 🔄 Kembalikan dalam bentuk { data: json } agar seragam
+    return { data: json };
+  } catch (err) {
+    console.error("❌ handleResponse error:", err);
+    throw new Error(err.message || "Respon server tidak valid");
+  }
 }

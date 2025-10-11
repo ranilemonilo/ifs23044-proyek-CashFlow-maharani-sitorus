@@ -1,14 +1,17 @@
 // src/features/auth/api/AuthApi.js
 import { apiHelper } from "@/helpers/apiHelper";
 
+const BASE_URL = import.meta.env.VITE_DELCOM_BASEURL;
+
 const AuthApi = {
   // REGISTER
   async register(formData) {
-    // 🧩 Tambahkan log ini untuk tes env di console browser
-    console.log("🌍 BASE URL:", import.meta.env.VITE_DELCOM_BASEURL);
-
+    console.log("🌍 BASE URL:", BASE_URL);
     try {
-      const response = await apiHelper.post("/auth/register", formData);
+      const response = await apiHelper.post(
+        `${BASE_URL}/auth/register`,
+        formData
+      );
       return response;
     } catch (error) {
       throw error;
@@ -18,17 +21,17 @@ const AuthApi = {
   // LOGIN
   async login(formData) {
     try {
-      const response = await apiHelper.post("/auth/login", formData);
+      const response = await apiHelper.post(`${BASE_URL}/auth/login`, formData);
       return response;
     } catch (error) {
       throw error;
     }
   },
 
-  // GET PROFILE (optional)
+  // GET PROFILE
   async getProfile(token) {
     try {
-      const response = await apiHelper.get("/auth/profile", token);
+      const response = await apiHelper.get(`${BASE_URL}/auth/profile`, token);
       return response;
     } catch (error) {
       throw error;

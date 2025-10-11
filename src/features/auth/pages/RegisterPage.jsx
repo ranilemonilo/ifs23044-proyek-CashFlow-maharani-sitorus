@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../states/authSlice";
 import Swal from "sweetalert2";
 import { useNavigate, Link } from "react-router-dom";
+console.log("🌍 BASE URL:", import.meta.env.VITE_DELCOM_BASEURL);
 
 const RegisterPage = () => {
   const dispatch = useDispatch();

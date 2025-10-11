@@ -4,6 +4,9 @@ import { apiHelper } from "@/helpers/apiHelper";
 const AuthApi = {
   // REGISTER
   async register(formData) {
+    // 🧩 Tambahkan log ini untuk tes env di console browser
+    console.log("🌍 BASE URL:", import.meta.env.VITE_DELCOM_BASEURL);
+
     try {
       const response = await apiHelper.post("/auth/register", formData);
       return response;

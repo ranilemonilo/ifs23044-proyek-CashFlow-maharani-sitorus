@@ -1,21 +1,22 @@
 import { apiHelper } from "@/helpers/apiHelper";
 
-// Ambil dari environment (.env)
-const BASE_URL = import.meta.env.VITE_DELCOM_BASEURL;
+// ✅ Pastikan environment sudah terbaca
+const BASE_URL =
+  import.meta.env.VITE_DELCOM_BASEURL?.trim().replace(/\/+$/, "") ||
+  "https://open-api.delcom.org/api/v1"; // fallback aman
+
+// Debug: lihat apakah environment kebaca
+console.log("🌍 BASE URL (aktif):", BASE_URL);
 
 const AuthApi = {
   // 🟢 REGISTER
   async register(formData) {
-    // Tambahkan log untuk debug environment dan endpoint
-    console.log("🌍 BASE URL:", BASE_URL);
-    console.log("📦 Register URL:", `${BASE_URL}/auth/register`);
+    const url = `${BASE_URL}/auth/register`;
+    console.log("📦 Register URL:", url);
     console.log("📤 Data dikirim:", formData);
 
     try {
-      const response = await apiHelper.post(
-        `${BASE_URL}/auth/register`,
-        formData
-      );
+      const response = await apiHelper.post(url, formData);
       console.log("✅ Response register:", response);
       return response;
     } catch (error) {
@@ -26,9 +27,13 @@ const AuthApi = {
 
   // 🟢 LOGIN
   async login(formData) {
-    console.log("📦 Login URL:", `${BASE_URL}/auth/login`);
+    const url = `${BASE_URL}/auth/login`;
+    console.log("📦 Login URL:", url);
+    console.log("📤 Data dikirim:", formData);
+
     try {
-      const response = await apiHelper.post(`${BASE_URL}/auth/login`, formData);
+      const response = await apiHelper.post(url, formData);
+      console.log("✅ Response login:", response);
       return response;
     } catch (error) {
       console.error("❌ Error login:", error);
@@ -36,11 +41,14 @@ const AuthApi = {
     }
   },
 
-  // 🟢 GET PROFILE
+  // 🟢 PROFILE
   async getProfile(token) {
-    console.log("📦 Profile URL:", `${BASE_URL}/auth/profile`);
+    const url = `${BASE_URL}/auth/profile`;
+    console.log("📦 Profile URL:", url);
+
     try {
-      const response = await apiHelper.get(`${BASE_URL}/auth/profile`, token);
+      const response = await apiHelper.get(url, token);
+      console.log("✅ Response profile:", response);
       return response;
     } catch (error) {
       console.error("❌ Error profile:", error);

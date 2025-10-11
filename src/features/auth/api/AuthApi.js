@@ -1,57 +1,36 @@
+// src/features/auth/api/AuthApi.js
 import { apiHelper } from "@/helpers/apiHelper";
 
-// ✅ Pastikan environment sudah terbaca
-const BASE_URL =
-  import.meta.env.VITE_DELCOM_BASEURL?.trim().replace(/\/+$/, "") ||
-  "https://open-api.delcom.org/api/v1"; // fallback aman
-
-// Debug: lihat apakah environment kebaca
-console.log("🌍 BASE URL (aktif):", BASE_URL);
-
 const AuthApi = {
-  // 🟢 REGISTER
+  // REGISTER
   async register(formData) {
-    const url = `${BASE_URL}/auth/register`;
-    console.log("📦 Register URL:", url);
-    console.log("📤 Data dikirim:", formData);
+    // 🧩 Tambahkan log ini untuk tes env di console browser
+    console.log("🌍 BASE URL:", import.meta.env.VITE_DELCOM_BASEURL);
 
     try {
-      const response = await apiHelper.post(url, formData);
-      console.log("✅ Response register:", response);
+      const response = await apiHelper.post("/auth/register", formData);
       return response;
     } catch (error) {
-      console.error("❌ Error register:", error);
       throw error;
     }
   },
 
-  // 🟢 LOGIN
+  // LOGIN
   async login(formData) {
-    const url = `${BASE_URL}/auth/login`;
-    console.log("📦 Login URL:", url);
-    console.log("📤 Data dikirim:", formData);
-
     try {
-      const response = await apiHelper.post(url, formData);
-      console.log("✅ Response login:", response);
+      const response = await apiHelper.post("/auth/login", formData);
       return response;
     } catch (error) {
-      console.error("❌ Error login:", error);
       throw error;
     }
   },
 
-  // 🟢 PROFILE
+  // GET PROFILE (optional)
   async getProfile(token) {
-    const url = `${BASE_URL}/auth/profile`;
-    console.log("📦 Profile URL:", url);
-
     try {
-      const response = await apiHelper.get(url, token);
-      console.log("✅ Response profile:", response);
+      const response = await apiHelper.get("/auth/profile", token);
       return response;
     } catch (error) {
-      console.error("❌ Error profile:", error);
       throw error;
     }
   },

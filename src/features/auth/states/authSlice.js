@@ -10,9 +10,22 @@ export const registerUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const res = await AuthApi.register(formData);
-      return res.data; // pastikan API mengembalikan data user & token
+
+      // Pastikan response ada dan terstruktur
+      if (!res || !res.data) {
+        throw new Error("Respon server tidak valid");
+      }
+
+      return res.data; // biasanya { user, token } atau pesan sukses
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
+      console.error("❌ registerUser error:", err);
+
+      // pastikan error selalu string
+      return rejectWithValue(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Terjadi kesalahan saat mendaftar"
+      );
     }
   }
 );
@@ -22,9 +35,19 @@ export const loginUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const res = await AuthApi.login(formData);
-      return res.data; // data: { user, token }
+
+      if (!res || !res.data) {
+        throw new Error("Respon server tidak valid");
+      }
+
+      return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
+      console.error("❌ loginUser error:", err);
+      return rejectWithValue(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Terjadi kesalahan saat login"
+      );
     }
   }
 );
@@ -33,7 +56,7 @@ export const loginUser = createAsyncThunk(
    ⚙️ State Awal
 ================================ */
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null, // ambil dari localStorage kalau ada
+  user: JSON.parse(localStorage.getItem("user")) || null,
   token: localStorage.getItem("token") || null,
   loading: false,
   error: null,
@@ -64,15 +87,19 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        localStorage.setItem("token", action.payload.token);
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
+
+        // kalau response tidak mengandung token/user, jangan simpan ke localStorage
+        const { user, token } = action.payload || {};
+        if (token) localStorage.setItem("token", token);
+        if (user) localStorage.setItem("user", JSON.stringify(user));
+
+        state.user = user || null;
+        state.token = token || null;
+        state.isAuthenticated = !!token;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Pendaftaran gagal";
       })
 
       // === LOGIN ===
@@ -82,15 +109,18 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        localStorage.setItem("token", action.payload.token);
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
+
+        const { user, token } = action.payload || {};
+        if (token) localStorage.setItem("token", token);
+        if (user) localStorage.setItem("user", JSON.stringify(user));
+
+        state.user = user || null;
+        state.token = token || null;
+        state.isAuthenticated = !!token;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Login gagal";
       });
   },
 });

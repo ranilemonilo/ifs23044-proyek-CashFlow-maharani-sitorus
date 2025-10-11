@@ -24,10 +24,32 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       await dispatch(registerUser(formData)).unwrap();
-      Swal.fire("Berhasil!", "Pendaftaran berhasil. Silakan login.", "success");
+
+      Swal.fire({
+        title: "Berhasil!",
+        text: "Pendaftaran berhasil. Silakan login.",
+        icon: "success",
+        confirmButtonColor: "#28a745",
+      });
+
       navigate("/auth/login");
     } catch (err) {
-      Swal.fire("Gagal!", err || "Pendaftaran gagal", "error");
+      console.error("❌ Error saat register:", err);
+
+      // Pastikan error yang dikirim ke SweetAlert berupa string, bukan object
+      const errorMessage =
+        typeof err === "string"
+          ? err
+          : err?.message ||
+            err?.response?.data?.message ||
+            "Terjadi kesalahan saat mendaftar.";
+
+      Swal.fire({
+        title: "Gagal!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#dc3545",
+      });
     }
   };
 

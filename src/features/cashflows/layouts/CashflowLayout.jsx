@@ -72,7 +72,7 @@ const CashFlowLayout = () => {
               }`
             }
           >
-            🏷️ {isOpen && "Statistik Label"}
+            OJOJ 🏷️ {isOpen && "Statistik Label"}
           </NavLink>
 
           <NavLink
